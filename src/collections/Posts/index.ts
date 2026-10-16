@@ -14,6 +14,9 @@ import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { Banner } from '../../blocks/Banner/config'
 import { Code } from '../../blocks/Code/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
+import { PhotographerProfile } from '../../blocks/PhotographerProfile/config'
+import { ScrollBanner } from '../../blocks/ScrollBanner/config'
+import { ScrollGallery } from '../../blocks/ScrollGallery/config'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
 import { populateAuthors } from './hooks/populateAuthors'
 import { revalidateDelete, revalidatePost } from './hooks/revalidatePost'
@@ -98,6 +101,16 @@ export const Posts: CollectionConfig<'posts'> = {
               }),
               label: false,
               required: true,
+            },
+            {
+              name: 'layout',
+              type: 'blocks',
+              admin: {
+                description: 'Full-width scroll sections rendered after the article body.',
+                initCollapsed: true,
+              },
+              blocks: [ScrollBanner, ScrollGallery, PhotographerProfile],
+              label: 'Scroll sections',
             },
           ],
           label: 'Content',

@@ -7,6 +7,9 @@ import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { ContentBlock } from '@/blocks/Content/Component'
 import { FormBlock } from '@/blocks/Form/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
+import { PhotographerProfileBlock } from '@/blocks/PhotographerProfile/Component'
+import { ScrollBannerBlock } from '@/blocks/ScrollBanner/Component'
+import { ScrollGalleryBlock } from '@/blocks/ScrollGallery/Component'
 
 const blockComponents = {
   archive: ArchiveBlock,
@@ -14,7 +17,13 @@ const blockComponents = {
   cta: CallToActionBlock,
   formBlock: FormBlock,
   mediaBlock: MediaBlock,
+  photographerProfile: PhotographerProfileBlock,
+  scrollBanner: ScrollBannerBlock,
+  scrollGallery: ScrollGalleryBlock,
 }
+
+// Blocks that should span the full width without the default vertical rhythm wrapper.
+const fullBleedBlocks = new Set(['scrollBanner'])
 
 export const RenderBlocks: React.FC<{
   blocks: Page['layout'][0][]
@@ -33,6 +42,13 @@ export const RenderBlocks: React.FC<{
             const Block = blockComponents[blockType]
 
             if (Block) {
+              if (fullBleedBlocks.has(blockType)) {
+                return (
+                  // @ts-expect-error there may be some mismatch between the expected types here
+                  <Block key={index} {...block} disableInnerContainer />
+                )
+              }
+
               return (
                 <div className="my-16" key={index}>
                   {/* @ts-expect-error there may be some mismatch between the expected types here */}

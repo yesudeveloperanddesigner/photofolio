@@ -70,7 +70,9 @@ export interface Config {
     pages: Page;
     posts: Post;
     media: Media;
+    photos: Photo;
     categories: Category;
+    galleries: Gallery;
     users: User;
     redirects: Redirect;
     forms: Form;
@@ -92,7 +94,9 @@ export interface Config {
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    photos: PhotosSelect<false> | PhotosSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    galleries: GalleriesSelect<false> | GalleriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
@@ -106,16 +110,18 @@ export interface Config {
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: string;
+    defaultIDType: number;
   };
   fallbackLocale: null;
   globals: {
     header: Header;
     footer: Footer;
+    settings: Setting;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    settings: SettingsSelect<false> | SettingsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -156,7 +162,7 @@ export interface UserAuthOperations {
  * via the `definition` "pages".
  */
 export interface Page {
-  id: string;
+  id: number;
   title: string;
   hero: {
     type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
@@ -183,11 +189,11 @@ export interface Page {
             reference?:
               | ({
                   relationTo: 'pages';
-                  value: string | Page;
+                  value: number | Page;
                 } | null)
               | ({
                   relationTo: 'posts';
-                  value: string | Post;
+                  value: number | Post;
                 } | null);
             url?: string | null;
             label: string;
@@ -199,15 +205,24 @@ export interface Page {
           id?: string | null;
         }[]
       | null;
-    media?: (string | null) | Media;
+    media?: (number | null) | Media;
   };
-  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
+  layout: (
+    | CallToActionBlock
+    | ContentBlock
+    | MediaBlock
+    | ArchiveBlock
+    | FormBlock
+    | ScrollBannerBlock
+    | ScrollGalleryBlock
+    | PhotographerProfileBlock
+  )[];
   meta?: {
     title?: string | null;
     /**
      * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
      */
-    image?: (string | null) | Media;
+    image?: (number | null) | Media;
     description?: string | null;
   };
   publishedAt?: string | null;
@@ -225,9 +240,9 @@ export interface Page {
  * via the `definition` "posts".
  */
 export interface Post {
-  id: string;
+  id: number;
   title: string;
-  heroImage?: (string | null) | Media;
+  heroImage?: (number | null) | Media;
   content: {
     root: {
       type: string;
@@ -243,18 +258,22 @@ export interface Post {
     };
     [k: string]: unknown;
   };
-  relatedPosts?: (string | Post)[] | null;
-  categories?: (string | Category)[] | null;
+  /**
+   * Full-width scroll sections rendered after the article body.
+   */
+  layout?: (ScrollBannerBlock | ScrollGalleryBlock | PhotographerProfileBlock)[] | null;
+  relatedPosts?: (number | Post)[] | null;
+  categories?: (number | Category)[] | null;
   meta?: {
     title?: string | null;
     /**
      * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
      */
-    image?: (string | null) | Media;
+    image?: (number | null) | Media;
     description?: string | null;
   };
   publishedAt?: string | null;
-  authors?: (string | User)[] | null;
+  authors?: (number | User)[] | null;
   populatedAuthors?:
     | {
         id?: string | null;
@@ -275,7 +294,7 @@ export interface Post {
  * via the `definition` "media".
  */
 export interface Media {
-  id: string;
+  id: number;
   alt?: string | null;
   caption?: {
     root: {
@@ -292,7 +311,10 @@ export interface Media {
     };
     [k: string]: unknown;
   } | null;
-  folder?: (string | null) | FolderInterface;
+  _key?: string | null;
+  prefix?: string | null;
+  _objectKey?: string | null;
+  folder?: (number | null) | FolderInterface;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -306,6 +328,7 @@ export interface Media {
   focalY?: number | null;
   sizes?: {
     thumbnail?: {
+      _key?: string | null;
       url?: string | null;
       width?: number | null;
       height?: number | null;
@@ -314,6 +337,7 @@ export interface Media {
       filename?: string | null;
     };
     square?: {
+      _key?: string | null;
       url?: string | null;
       width?: number | null;
       height?: number | null;
@@ -322,6 +346,7 @@ export interface Media {
       filename?: string | null;
     };
     small?: {
+      _key?: string | null;
       url?: string | null;
       width?: number | null;
       height?: number | null;
@@ -330,6 +355,7 @@ export interface Media {
       filename?: string | null;
     };
     medium?: {
+      _key?: string | null;
       url?: string | null;
       width?: number | null;
       height?: number | null;
@@ -338,6 +364,7 @@ export interface Media {
       filename?: string | null;
     };
     large?: {
+      _key?: string | null;
       url?: string | null;
       width?: number | null;
       height?: number | null;
@@ -346,6 +373,7 @@ export interface Media {
       filename?: string | null;
     };
     xlarge?: {
+      _key?: string | null;
       url?: string | null;
       width?: number | null;
       height?: number | null;
@@ -354,6 +382,7 @@ export interface Media {
       filename?: string | null;
     };
     og?: {
+      _key?: string | null;
       url?: string | null;
       width?: number | null;
       height?: number | null;
@@ -368,18 +397,18 @@ export interface Media {
  * via the `definition` "payload-folders".
  */
 export interface FolderInterface {
-  id: string;
+  id: number;
   name: string;
-  folder?: (string | null) | FolderInterface;
+  folder?: (number | null) | FolderInterface;
   documentsAndFolders?: {
     docs?: (
       | {
           relationTo?: 'payload-folders';
-          value: string | FolderInterface;
+          value: number | FolderInterface;
         }
       | {
           relationTo?: 'media';
-          value: string | Media;
+          value: number | Media;
         }
     )[];
     hasNextPage?: boolean;
@@ -391,20 +420,351 @@ export interface FolderInterface {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ScrollBannerBlock".
+ */
+export interface ScrollBannerBlock {
+  /**
+   * Small label shown above the title.
+   */
+  eyebrow?: string | null;
+  /**
+   * The large statement. Scroll reveals it word by word.
+   */
+  title: string;
+  subtitle?: string | null;
+  /**
+   * Shown in the corner, e.g. "Lisbon, PT".
+   */
+  location?: string | null;
+  image?: {
+    /**
+     * Pick an image from the media library.
+     */
+    media?: (number | null) | Media;
+    /**
+     * External image URL. Used when no media is selected (e.g. a placeholder).
+     */
+    url?: string | null;
+    /**
+     * Describes the image for screen readers and SEO.
+     */
+    alt?: string | null;
+  };
+  /**
+   * Darken the image so the text stays legible (0–90).
+   */
+  overlay?: number | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'scrollBanner';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ScrollGalleryBlock".
+ */
+export interface ScrollGalleryBlock {
+  eyebrow?: string | null;
+  /**
+   * Optional large heading above the gallery.
+   */
+  heading?: string | null;
+  intro?: string | null;
+  /**
+   * Pick a gallery from the Galleries collection. Leave empty to use individual photos or the featured gallery.
+   */
+  gallery?: (number | null) | Gallery;
+  /**
+   * Pick photos directly from the Photos library. Used when no gallery is selected above and takes precedence over the inline images below.
+   */
+  photos?: (number | Photo)[] | null;
+  /**
+   * Fallback inline images. Only used when no gallery or photos are available (e.g. before seeding).
+   */
+  items?:
+    | {
+        image?: {
+          /**
+           * Pick an image from the media library.
+           */
+          media?: (number | null) | Media;
+          /**
+           * External image URL. Used when no media is selected (e.g. a placeholder).
+           */
+          url?: string | null;
+          /**
+           * Describes the image for screen readers and SEO.
+           */
+          alt?: string | null;
+        };
+        caption?: string | null;
+        /**
+         * Short detail, e.g. "35mm · Lisbon · 2024".
+         */
+        meta?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'scrollGallery';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "galleries".
+ */
+export interface Gallery {
+  id: number;
+  title: string;
+  /**
+   * Optional short identifier, e.g. "selected-work".
+   */
+  slug?: string | null;
+  description?: string | null;
+  /**
+   * Use this gallery as the default one shown where a block has no gallery selected.
+   */
+  featured?: boolean | null;
+  /**
+   * Pick photos from the Photos library. These are shown in the gallery, in the order selected and take precedence over the inline images below.
+   */
+  photos?: (number | Photo)[] | null;
+  /**
+   * Fallback inline images used only when no photos are selected above (e.g. before the library is filled).
+   */
+  images?:
+    | {
+        image?: {
+          /**
+           * Pick an image from the media library.
+           */
+          media?: (number | null) | Media;
+          /**
+           * External image URL. Used when no media is selected (e.g. a placeholder).
+           */
+          url?: string | null;
+          /**
+           * Describes the image for screen readers and SEO.
+           */
+          alt?: string | null;
+        };
+        caption?: string | null;
+        /**
+         * Short detail, e.g. "35mm · Lisbon · 2024".
+         */
+        meta?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Upload photography here. Galleries and page blocks pick from this library.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "photos".
+ */
+export interface Photo {
+  id: number;
+  /**
+   * A short name for this photo.
+   */
+  title?: string | null;
+  /**
+   * Describes the image for screen readers and SEO.
+   */
+  alt?: string | null;
+  /**
+   * Shown with the image in galleries.
+   */
+  caption?: string | null;
+  /**
+   * Keywords used to filter and group photographs.
+   */
+  tags?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Used to lay the image out in galleries.
+   */
+  orientation?: ('landscape' | 'portrait' | 'square') | null;
+  /**
+   * Where the photo was taken, e.g. "Lisbon, PT".
+   */
+  location?: string | null;
+  shotAt?: string | null;
+  /**
+   * Camera / lens / film, e.g. "Hasselblad 500CM · Portra 400".
+   */
+  camera?: string | null;
+  /**
+   * Prioritise this photo when a fallback selection is needed.
+   */
+  featured?: boolean | null;
+  _key?: string | null;
+  prefix?: string | null;
+  _objectKey?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      _key?: string | null;
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    square?: {
+      _key?: string | null;
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    small?: {
+      _key?: string | null;
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    medium?: {
+      _key?: string | null;
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    large?: {
+      _key?: string | null;
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    xlarge?: {
+      _key?: string | null;
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    og?: {
+      _key?: string | null;
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PhotographerProfileBlock".
+ */
+export interface PhotographerProfileBlock {
+  eyebrow?: string | null;
+  /**
+   * A short statement about the photographer.
+   */
+  heading: string;
+  /**
+   * One or two paragraphs of description.
+   */
+  bio?: string | null;
+  /**
+   * Pick photos from the Photos library for the masonry cluster. Takes precedence over the inline images below.
+   */
+  photos?: (number | Photo)[] | null;
+  /**
+   * Fallback inline images used only when no photos are selected above (e.g. before the library is filled).
+   */
+  images?:
+    | {
+        image?: {
+          /**
+           * Pick an image from the media library.
+           */
+          media?: (number | null) | Media;
+          /**
+           * External image URL. Used when no media is selected (e.g. a placeholder).
+           */
+          url?: string | null;
+          /**
+           * Describes the image for screen readers and SEO.
+           */
+          alt?: string | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Specialities shown as a list of tags.
+   */
+  skills?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  contact?: {
+    email?: string | null;
+    phone?: string | null;
+    location?: string | null;
+  };
+  socials?:
+    | {
+        platform: 'instagram' | 'behance' | 'x' | 'linkedin' | 'vimeo' | 'website' | 'other';
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'photographerProfile';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories".
  */
 export interface Category {
-  id: string;
+  id: number;
   title: string;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
   generateSlug?: boolean | null;
   slug: string;
-  parent?: (string | null) | Category;
+  parent?: (number | null) | Category;
   breadcrumbs?:
     | {
-        doc?: (string | null) | Category;
+        doc?: (number | null) | Category;
         url?: string | null;
         label?: string | null;
         id?: string | null;
@@ -418,7 +778,7 @@ export interface Category {
  * via the `definition` "users".
  */
 export interface User {
-  id: string;
+  id: number;
   name?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -427,6 +787,7 @@ export interface User {
   resetPasswordExpiration?: string | null;
   salt?: string | null;
   hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
   loginAttempts?: number | null;
   lockUntil?: string | null;
   sessions?:
@@ -467,11 +828,11 @@ export interface CallToActionBlock {
           reference?:
             | ({
                 relationTo: 'pages';
-                value: string | Page;
+                value: number | Page;
               } | null)
             | ({
                 relationTo: 'posts';
-                value: string | Post;
+                value: number | Post;
               } | null);
           url?: string | null;
           label: string;
@@ -517,11 +878,11 @@ export interface ContentBlock {
           reference?:
             | ({
                 relationTo: 'pages';
-                value: string | Page;
+                value: number | Page;
               } | null)
             | ({
                 relationTo: 'posts';
-                value: string | Post;
+                value: number | Post;
               } | null);
           url?: string | null;
           label: string;
@@ -542,7 +903,7 @@ export interface ContentBlock {
  * via the `definition` "MediaBlock".
  */
 export interface MediaBlock {
-  media: string | Media;
+  media: number | Media;
   id?: string | null;
   blockName?: string | null;
   blockType: 'mediaBlock';
@@ -569,12 +930,12 @@ export interface ArchiveBlock {
   } | null;
   populateBy?: ('collection' | 'selection') | null;
   relationTo?: 'posts' | null;
-  categories?: (string | Category)[] | null;
+  categories?: (number | Category)[] | null;
   limit?: number | null;
   selectedDocs?:
     | {
         relationTo: 'posts';
-        value: string | Post;
+        value: number | Post;
       }[]
     | null;
   id?: string | null;
@@ -586,7 +947,7 @@ export interface ArchiveBlock {
  * via the `definition` "FormBlock".
  */
 export interface FormBlock {
-  form: string | Form;
+  form: number | Form;
   enableIntro?: boolean | null;
   introContent?: {
     root: {
@@ -612,7 +973,7 @@ export interface FormBlock {
  * via the `definition` "forms".
  */
 export interface Form {
-  id: string;
+  id: number;
   title: string;
   fields?:
     | (
@@ -724,9 +1085,6 @@ export interface Form {
       )[]
     | null;
   submitButtonLabel?: string | null;
-  /**
-   * Choose whether to display an on-page message or redirect to a different page after they submit the form.
-   */
   confirmationType?: ('message' | 'redirect') | null;
   confirmationMessage?: {
     root: {
@@ -746,9 +1104,6 @@ export interface Form {
   redirect?: {
     url: string;
   };
-  /**
-   * Send custom emails when the form submits. Use comma separated lists to send the same email to multiple recipients. To reference a value from this form, wrap that field's name with double curly brackets, i.e. {{firstName}}. You can use a wildcard {{*}} to output all data and {{*:table}} to format it as an HTML table in the email.
-   */
   emails?:
     | {
         emailTo?: string | null;
@@ -757,9 +1112,6 @@ export interface Form {
         replyTo?: string | null;
         emailFrom?: string | null;
         subject: string;
-        /**
-         * Enter the message that should be sent in this email.
-         */
         message?: {
           root: {
             type: string;
@@ -786,7 +1138,7 @@ export interface Form {
  * via the `definition` "redirects".
  */
 export interface Redirect {
-  id: string;
+  id: number;
   /**
    * You will need to rebuild the website when changing this field.
    */
@@ -796,11 +1148,11 @@ export interface Redirect {
     reference?:
       | ({
           relationTo: 'pages';
-          value: string | Page;
+          value: number | Page;
         } | null)
       | ({
           relationTo: 'posts';
-          value: string | Post;
+          value: number | Post;
         } | null);
     url?: string | null;
   };
@@ -812,8 +1164,8 @@ export interface Redirect {
  * via the `definition` "form-submissions".
  */
 export interface FormSubmission {
-  id: string;
-  form: string | Form;
+  id: number;
+  form: number | Form;
   submissionData?:
     | {
         field: string;
@@ -831,18 +1183,18 @@ export interface FormSubmission {
  * via the `definition` "search".
  */
 export interface Search {
-  id: string;
+  id: number;
   title?: string | null;
   priority?: number | null;
   doc: {
     relationTo: 'posts';
-    value: string | Post;
+    value: number | Post;
   };
   slug?: string | null;
   meta?: {
     title?: string | null;
     description?: string | null;
-    image?: (string | null) | Media;
+    image?: (number | null) | Media;
   };
   categories?:
     | {
@@ -860,7 +1212,7 @@ export interface Search {
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
-  id: string;
+  id: number;
   key: string;
   data:
     | {
@@ -877,7 +1229,7 @@ export interface PayloadKv {
  * via the `definition` "payload-jobs".
  */
 export interface PayloadJob {
-  id: string;
+  id: number;
   /**
    * Input data provided to the job
    */
@@ -969,52 +1321,60 @@ export interface PayloadJob {
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: string;
+  id: number;
   document?:
     | ({
         relationTo: 'pages';
-        value: string | Page;
+        value: number | Page;
       } | null)
     | ({
         relationTo: 'posts';
-        value: string | Post;
+        value: number | Post;
       } | null)
     | ({
         relationTo: 'media';
-        value: string | Media;
+        value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'photos';
+        value: number | Photo;
       } | null)
     | ({
         relationTo: 'categories';
-        value: string | Category;
+        value: number | Category;
+      } | null)
+    | ({
+        relationTo: 'galleries';
+        value: number | Gallery;
       } | null)
     | ({
         relationTo: 'users';
-        value: string | User;
+        value: number | User;
       } | null)
     | ({
         relationTo: 'redirects';
-        value: string | Redirect;
+        value: number | Redirect;
       } | null)
     | ({
         relationTo: 'forms';
-        value: string | Form;
+        value: number | Form;
       } | null)
     | ({
         relationTo: 'form-submissions';
-        value: string | FormSubmission;
+        value: number | FormSubmission;
       } | null)
     | ({
         relationTo: 'search';
-        value: string | Search;
+        value: number | Search;
       } | null)
     | ({
         relationTo: 'payload-folders';
-        value: string | FolderInterface;
+        value: number | FolderInterface;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -1024,10 +1384,10 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: string;
+  id: number;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   key?: string | null;
   value?:
@@ -1047,7 +1407,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: string;
+  id: number;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -1089,6 +1449,9 @@ export interface PagesSelect<T extends boolean = true> {
         mediaBlock?: T | MediaBlockSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
+        scrollBanner?: T | ScrollBannerBlockSelect<T>;
+        scrollGallery?: T | ScrollGalleryBlockSelect<T>;
+        photographerProfile?: T | PhotographerProfileBlockSelect<T>;
       };
   meta?:
     | T
@@ -1190,12 +1553,110 @@ export interface FormBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ScrollBannerBlock_select".
+ */
+export interface ScrollBannerBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  subtitle?: T;
+  location?: T;
+  image?:
+    | T
+    | {
+        media?: T;
+        url?: T;
+        alt?: T;
+      };
+  overlay?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ScrollGalleryBlock_select".
+ */
+export interface ScrollGalleryBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  intro?: T;
+  gallery?: T;
+  photos?: T;
+  items?:
+    | T
+    | {
+        image?:
+          | T
+          | {
+              media?: T;
+              url?: T;
+              alt?: T;
+            };
+        caption?: T;
+        meta?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PhotographerProfileBlock_select".
+ */
+export interface PhotographerProfileBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  bio?: T;
+  photos?: T;
+  images?:
+    | T
+    | {
+        image?:
+          | T
+          | {
+              media?: T;
+              url?: T;
+              alt?: T;
+            };
+        id?: T;
+      };
+  skills?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  contact?:
+    | T
+    | {
+        email?: T;
+        phone?: T;
+        location?: T;
+      };
+  socials?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts_select".
  */
 export interface PostsSelect<T extends boolean = true> {
   title?: T;
   heroImage?: T;
   content?: T;
+  layout?:
+    | T
+    | {
+        scrollBanner?: T | ScrollBannerBlockSelect<T>;
+        scrollGallery?: T | ScrollGalleryBlockSelect<T>;
+        photographerProfile?: T | PhotographerProfileBlockSelect<T>;
+      };
   relatedPosts?: T;
   categories?: T;
   meta?:
@@ -1226,6 +1687,9 @@ export interface PostsSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
+  _key?: T;
+  prefix?: T;
+  _objectKey?: T;
   folder?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1244,6 +1708,7 @@ export interface MediaSelect<T extends boolean = true> {
         thumbnail?:
           | T
           | {
+              _key?: T;
               url?: T;
               width?: T;
               height?: T;
@@ -1254,6 +1719,7 @@ export interface MediaSelect<T extends boolean = true> {
         square?:
           | T
           | {
+              _key?: T;
               url?: T;
               width?: T;
               height?: T;
@@ -1264,6 +1730,7 @@ export interface MediaSelect<T extends boolean = true> {
         small?:
           | T
           | {
+              _key?: T;
               url?: T;
               width?: T;
               height?: T;
@@ -1274,6 +1741,7 @@ export interface MediaSelect<T extends boolean = true> {
         medium?:
           | T
           | {
+              _key?: T;
               url?: T;
               width?: T;
               height?: T;
@@ -1284,6 +1752,7 @@ export interface MediaSelect<T extends boolean = true> {
         large?:
           | T
           | {
+              _key?: T;
               url?: T;
               width?: T;
               height?: T;
@@ -1294,6 +1763,7 @@ export interface MediaSelect<T extends boolean = true> {
         xlarge?:
           | T
           | {
+              _key?: T;
               url?: T;
               width?: T;
               height?: T;
@@ -1304,6 +1774,122 @@ export interface MediaSelect<T extends boolean = true> {
         og?:
           | T
           | {
+              _key?: T;
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "photos_select".
+ */
+export interface PhotosSelect<T extends boolean = true> {
+  title?: T;
+  alt?: T;
+  caption?: T;
+  tags?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  orientation?: T;
+  location?: T;
+  shotAt?: T;
+  camera?: T;
+  featured?: T;
+  _key?: T;
+  prefix?: T;
+  _objectKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              _key?: T;
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        square?:
+          | T
+          | {
+              _key?: T;
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        small?:
+          | T
+          | {
+              _key?: T;
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        medium?:
+          | T
+          | {
+              _key?: T;
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        large?:
+          | T
+          | {
+              _key?: T;
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        xlarge?:
+          | T
+          | {
+              _key?: T;
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        og?:
+          | T
+          | {
+              _key?: T;
               url?: T;
               width?: T;
               height?: T;
@@ -1335,6 +1921,33 @@ export interface CategoriesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "galleries_select".
+ */
+export interface GalleriesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  description?: T;
+  featured?: T;
+  photos?: T;
+  images?:
+    | T
+    | {
+        image?:
+          | T
+          | {
+              media?: T;
+              url?: T;
+              alt?: T;
+            };
+        caption?: T;
+        meta?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
@@ -1346,6 +1959,7 @@ export interface UsersSelect<T extends boolean = true> {
   resetPasswordExpiration?: T;
   salt?: T;
   hash?: T;
+  resetPasswordRequestedAt?: T;
   loginAttempts?: T;
   lockUntil?: T;
   sessions?:
@@ -1636,7 +2250,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  * via the `definition` "header".
  */
 export interface Header {
-  id: string;
+  id: number;
   navItems?:
     | {
         link: {
@@ -1645,11 +2259,11 @@ export interface Header {
           reference?:
             | ({
                 relationTo: 'pages';
-                value: string | Page;
+                value: number | Page;
               } | null)
             | ({
                 relationTo: 'posts';
-                value: string | Post;
+                value: number | Post;
               } | null);
           url?: string | null;
           label: string;
@@ -1665,7 +2279,7 @@ export interface Header {
  * via the `definition` "footer".
  */
 export interface Footer {
-  id: string;
+  id: number;
   navItems?:
     | {
         link: {
@@ -1674,11 +2288,11 @@ export interface Footer {
           reference?:
             | ({
                 relationTo: 'pages';
-                value: string | Page;
+                value: number | Page;
               } | null)
             | ({
                 relationTo: 'posts';
-                value: string | Post;
+                value: number | Post;
               } | null);
           url?: string | null;
           label: string;
@@ -1686,6 +2300,136 @@ export interface Footer {
         id?: string | null;
       }[]
     | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Global content for the whole website — identity, contact, SEO, banner and footer.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "settings".
+ */
+export interface Setting {
+  id: number;
+  /**
+   * Used as the site title, in the header, footer and SEO.
+   */
+  siteName: string;
+  /**
+   * A short line shown beneath the name or logo.
+   */
+  tagline?: string | null;
+  /**
+   * The default description used for SEO and social sharing.
+   */
+  description?: string | null;
+  /**
+   * Logo used on light backgrounds. Falls back to the site name as text.
+   */
+  logo?: (number | null) | Media;
+  /**
+   * Optional logo used on dark backgrounds (header/footer in dark mode).
+   */
+  logoDark?: (number | null) | Media;
+  /**
+   * Text shown instead of a logo image, e.g. "Elena Marchetti".
+   */
+  logoText?: string | null;
+  /**
+   * Optional favicon override.
+   */
+  favicon?: (number | null) | Media;
+  contact?: {
+    email?: string | null;
+    phone?: string | null;
+    /**
+     * e.g. "Lisbon, Portugal".
+     */
+    location?: string | null;
+    address?: string | null;
+  };
+  socials?:
+    | {
+        platform: 'instagram' | 'behance' | 'x' | 'linkedin' | 'vimeo' | 'youtube' | 'website' | 'other';
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  seo?: {
+    /**
+     * Default page title used when a page has no SEO title of its own.
+     */
+    metaTitle?: string | null;
+    /**
+     * Default meta description.
+     */
+    metaDescription?: string | null;
+    /**
+     * Default social sharing image (1200×630 recommended).
+     */
+    ogImage?: (number | null) | Media;
+  };
+  header?: {
+    showSearch?: boolean | null;
+    cta?: {
+      /**
+       * Leave the label and URL empty to hide the button.
+       */
+      label?: string | null;
+      /**
+       * Where the button links, e.g. "/contact".
+       */
+      url?: string | null;
+      newTab?: boolean | null;
+    };
+  };
+  homeBanner?: {
+    /**
+     * The full-bleed image in the first section of the landing page.
+     */
+    image?: (number | null) | Media;
+    eyebrow?: string | null;
+    /**
+     * The large statement. Scroll reveals it word by word.
+     */
+    title?: string | null;
+    subtitle?: string | null;
+    /**
+     * Shown in the corner, e.g. "Lisbon, PT".
+     */
+    location?: string | null;
+    /**
+     * Darken the image so the text stays legible (0–90).
+     */
+    overlay?: number | null;
+  };
+  footer?: {
+    /**
+     * A short blurb shown in the footer.
+     */
+    description?: string | null;
+    /**
+     * Copyright line. Use {year} for the current year.
+     */
+    copyright?: string | null;
+    /**
+     * Small print, e.g. "All photographs © the artist".
+     */
+    note?: string | null;
+    dateTime?: {
+      show?: boolean | null;
+      label?: string | null;
+      display?: ('currentDate' | 'currentTime' | 'currentDateTime' | 'custom' | 'none') | null;
+      /**
+       * Used when "Custom text" is selected above.
+       */
+      customText?: string | null;
+      /**
+       * IANA time zone, e.g. "Europe/Lisbon" or "UTC".
+       */
+      timezone?: string | null;
+    };
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1737,6 +2481,82 @@ export interface FooterSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "settings_select".
+ */
+export interface SettingsSelect<T extends boolean = true> {
+  siteName?: T;
+  tagline?: T;
+  description?: T;
+  logo?: T;
+  logoDark?: T;
+  logoText?: T;
+  favicon?: T;
+  contact?:
+    | T
+    | {
+        email?: T;
+        phone?: T;
+        location?: T;
+        address?: T;
+      };
+  socials?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
+  header?:
+    | T
+    | {
+        showSearch?: T;
+        cta?:
+          | T
+          | {
+              label?: T;
+              url?: T;
+              newTab?: T;
+            };
+      };
+  homeBanner?:
+    | T
+    | {
+        image?: T;
+        eyebrow?: T;
+        title?: T;
+        subtitle?: T;
+        location?: T;
+        overlay?: T;
+      };
+  footer?:
+    | T
+    | {
+        description?: T;
+        copyright?: T;
+        note?: T;
+        dateTime?:
+          | T
+          | {
+              show?: T;
+              label?: T;
+              display?: T;
+              customText?: T;
+              timezone?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "collections_widget".
  */
 export interface CollectionsWidget {
@@ -1756,14 +2576,17 @@ export interface TaskSchedulePublish {
     doc?:
       | ({
           relationTo: 'pages';
-          value: string | Page;
+          value: number | Page;
         } | null)
       | ({
           relationTo: 'posts';
-          value: string | Post;
+          value: number | Post;
         } | null);
     global?: string | null;
-    user?: (string | null) | User;
+    user?: {
+      relationTo: 'users';
+      value: number | User;
+    } | null;
   };
   output?: unknown;
 }

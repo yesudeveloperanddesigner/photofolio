@@ -6,9 +6,11 @@ node_modules
 .next
 next-env.d.ts
 .vercel
+*.tsbuildinfo
 
 # Payload default media upload directory
 public/media/
+public/photos/
 
 public/robots.txt
 public/sitemap*.xml

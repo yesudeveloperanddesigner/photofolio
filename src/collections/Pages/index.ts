@@ -7,6 +7,9 @@ import { CallToAction } from '../../blocks/CallToAction/config'
 import { Content } from '../../blocks/Content/config'
 import { FormBlock } from '../../blocks/Form/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
+import { PhotographerProfile } from '../../blocks/PhotographerProfile/config'
+import { ScrollBanner } from '../../blocks/ScrollBanner/config'
+import { ScrollGallery } from '../../blocks/ScrollGallery/config'
 import { hero } from '@/heros/config'
 import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
@@ -72,7 +75,16 @@ export const Pages: CollectionConfig<'pages'> = {
             {
               name: 'layout',
               type: 'blocks',
-              blocks: [CallToAction, Content, MediaBlock, Archive, FormBlock],
+              blocks: [
+                CallToAction,
+                Content,
+                MediaBlock,
+                Archive,
+                FormBlock,
+                ScrollBanner,
+                ScrollGallery,
+                PhotographerProfile,
+              ],
               required: true,
               admin: {
                 initCollapsed: true,

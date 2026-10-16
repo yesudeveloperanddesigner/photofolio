@@ -7,6 +7,7 @@ import React from 'react'
 import { Search } from '@/search/Component'
 import PageClient from './page.client'
 import { CardPostData } from '@/components/Card'
+import { getCachedGlobal } from '@/utilities/getGlobals'
 
 type Args = {
   searchParams: Promise<{
@@ -81,8 +82,10 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
   )
 }
 
-export function generateMetadata(): Metadata {
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getCachedGlobal('settings', 1)()
+
   return {
-    title: `Payload Website Template Search`,
+    title: settings?.siteName ? `Search | ${settings.siteName}` : 'Search',
   }
 }

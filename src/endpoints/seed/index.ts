@@ -1,4 +1,4 @@
-import type { CollectionSlug, GlobalSlug, Payload, PayloadRequest, File } from 'payload'
+import type { CollectionSlug, Payload, PayloadRequest, File } from 'payload'
 
 import { contactForm as contactFormData } from './contact-form'
 import { contact as contactPageData } from './contact-page'
@@ -6,21 +6,25 @@ import { home } from './home'
 import { image1 } from './image-1'
 import { image2 } from './image-2'
 import { imageHero1 } from './image-hero-1'
+import { photoSeeds } from './photos'
 import { post1 } from './post-1'
 import { post2 } from './post-2'
 import { post3 } from './post-3'
+import { settingsSeed } from './settings'
 
 const collections: CollectionSlug[] = [
   'categories',
   'media',
+  'photos',
   'pages',
   'posts',
   'forms',
   'form-submissions',
   'search',
+  'galleries',
 ]
 
-const globals: GlobalSlug[] = ['header', 'footer']
+const globals = ['header', 'footer'] as const
 
 const categories = ['Technology', 'News', 'Finance', 'Design', 'Software', 'Engineering']
 
@@ -176,6 +180,9 @@ export const seed = async ({
     data: {
       relatedPosts: [post2Doc.id, post3Doc.id],
     },
+    context: {
+      disableRevalidate: true,
+    },
   })
   await payload.update({
     id: post2Doc.id,
@@ -183,12 +190,72 @@ export const seed = async ({
     data: {
       relatedPosts: [post1Doc.id, post3Doc.id],
     },
+    context: {
+      disableRevalidate: true,
+    },
   })
   await payload.update({
     id: post3Doc.id,
     collection: 'posts',
     data: {
       relatedPosts: [post1Doc.id, post2Doc.id],
+    },
+    context: {
+      disableRevalidate: true,
+    },
+  })
+
+  payload.logger.info(`— Seeding photos...`)
+
+  const downloadedPhotos = await Promise.all(
+    photoSeeds.map((photo) =>
+      fetchFileByURL(
+        `https://picsum.photos/seed/${photo.seed}/${photo.size[0]}/${photo.size[1]}.jpg`,
+      ),
+    ),
+  )
+
+  const photos = await Promise.all(
+    photoSeeds.map((photo, index) =>
+      payload.create({
+        collection: 'photos',
+        depth: 0,
+        context: {
+          disableRevalidate: true,
+        },
+        data: {
+          alt: photo.alt,
+          camera: photo.camera,
+          caption: photo.caption,
+          featured: index < 3,
+          location: photo.location,
+          orientation: photo.orientation,
+          shotAt: photo.shotAt,
+          tags: photo.tags,
+          title: photo.title,
+        },
+        file: {
+          ...downloadedPhotos[index],
+          name: `${photo.seed}.jpg`,
+        },
+      }),
+    ),
+  )
+
+  payload.logger.info(`— Seeding gallery...`)
+
+  const gallery = await payload.create({
+    collection: 'galleries',
+    depth: 0,
+    context: {
+      disableRevalidate: true,
+    },
+    data: {
+      description: 'A scroll-driven selection of recent photographs.',
+      featured: true,
+      photos: photos.map((photo) => photo.id),
+      slug: 'selected-work',
+      title: 'Selected Work',
     },
   })
 
@@ -206,20 +273,28 @@ export const seed = async ({
     payload.create({
       collection: 'pages',
       depth: 0,
-      data: home({ heroImage: imageHomeDoc, metaImage: image2Doc }),
+      context: {
+        disableRevalidate: true,
+      },
+      data: home({ gallery, photos }),
     }),
     payload.create({
       collection: 'pages',
       depth: 0,
+      context: {
+        disableRevalidate: true,
+      },
       data: contactPageData({ contactForm: contactForm }),
     }),
   ])
 
   payload.logger.info(`— Seeding globals...`)
-
   await Promise.all([
     payload.updateGlobal({
       slug: 'header',
+      context: {
+        disableRevalidate: true,
+      },
       data: {
         navItems: [
           {
@@ -244,33 +319,47 @@ export const seed = async ({
     }),
     payload.updateGlobal({
       slug: 'footer',
+      context: {
+        disableRevalidate: true,
+      },
       data: {
         navItems: [
           {
             link: {
-              type: 'custom',
-              label: 'Admin',
-              url: '/admin',
+              type: 'reference',
+              label: 'Contact',
+              reference: {
+                relationTo: 'pages',
+                value: contactPage.id,
+              },
             },
           },
           {
             link: {
               type: 'custom',
-              label: 'Source Code',
-              newTab: true,
-              url: 'https://github.com/payloadcms/payload/tree/3.x/templates/website',
+              label: 'Archive',
+              url: '/posts',
             },
           },
           {
             link: {
               type: 'custom',
-              label: 'Payload',
-              newTab: true,
-              url: 'https://payloadcms.com/',
+              label: 'Search',
+              url: '/search',
             },
           },
         ],
       },
+    }),
+    payload.updateGlobal({
+      slug: 'settings',
+      context: {
+        disableRevalidate: true,
+      },
+      data: settingsSeed({
+        bannerImage: imageHomeDoc.id,
+        ogImage: image2Doc.id,
+      }),
     }),
   ])
 

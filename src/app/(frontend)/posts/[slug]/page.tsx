@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 
 import { RelatedPosts } from '@/blocks/RelatedPosts/Component'
+import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
@@ -51,6 +52,8 @@ export default async function Post({ params: paramsPromise }: Args) {
 
   if (!post) return <PayloadRedirects url={url} />
 
+  const { layout } = post
+
   return (
     <article className="pt-16 pb-16">
       <PageClient />
@@ -73,6 +76,8 @@ export default async function Post({ params: paramsPromise }: Args) {
           )}
         </div>
       </div>
+
+      {layout && layout.length > 0 && <RenderBlocks blocks={layout} />}
     </article>
   )
 }

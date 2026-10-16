@@ -3,6 +3,7 @@ import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { searchPlugin } from '@payloadcms/plugin-search'
+import { uploadthingStorage } from '@payloadcms/storage-uploadthing'
 import { Plugin } from 'payload'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
@@ -13,8 +14,12 @@ import { beforeSyncWithSearch } from '@/search/beforeSync'
 import { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
 
-const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
-  return doc?.title ? `${doc.title} | Payload Website Template` : 'Payload Website Template'
+const generateTitle: GenerateTitle<Post | Page> = async ({ doc, req }) => {
+  const settings = await req.payload.findGlobal({ slug: 'settings', depth: 0 }).catch(() => null)
+
+  const siteName = settings?.siteName || 'Photography Portfolio'
+
+  return doc?.title ? `${doc.title} | ${siteName}` : siteName
 }
 
 const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
@@ -24,6 +29,21 @@ const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
 }
 
 export const plugins: Plugin[] = [
+  uploadthingStorage({
+    collections: {
+      // Files are public portfolio assets, so serve them straight from the
+      // UploadThing CDN instead of proxying every request through Payload.
+      media: { disablePayloadAccessControl: true },
+      photos: { disablePayloadAccessControl: true },
+    },
+    // Upload directly from the browser so large images bypass Vercel's
+    // serverless request body limit. Requires UPLOADTHING_TOKEN.
+    clientUploads: true,
+    options: {
+      acl: 'public-read',
+      token: process.env.UPLOADTHING_TOKEN,
+    },
+  }),
   redirectsPlugin({
     collections: ['pages', 'posts'],
     overrides: {

@@ -22,6 +22,9 @@ const nextConfig: NextConfig = {
       {
         pathname: '/api/media/file/**',
       },
+      {
+        pathname: '/api/photos/file/**',
+      },
     ],
     qualities: [100],
     remotePatterns: [
@@ -33,6 +36,13 @@ const nextConfig: NextConfig = {
           protocol: url.protocol.replace(':', '') as 'http' | 'https',
         }
       }),
+      // Placeholder photography from Unsplash until real media is uploaded.
+      { hostname: 'images.unsplash.com', protocol: 'https' as const },
+      { hostname: 'plus.unsplash.com', protocol: 'https' as const },
+      { hostname: 'picsum.photos', protocol: 'https' as const },
+      // UploadThing object storage (media + photos assets).
+      { hostname: 'utfs.io', protocol: 'https' as const },
+      { hostname: '*.ufs.sh', protocol: 'https' as const },
     ],
   },
   webpack: (webpackConfig) => {
