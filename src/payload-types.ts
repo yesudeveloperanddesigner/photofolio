@@ -71,6 +71,7 @@ export interface Config {
     posts: Post;
     media: Media;
     photos: Photo;
+    videos: Video;
     categories: Category;
     galleries: Gallery;
     users: User;
@@ -95,6 +96,7 @@ export interface Config {
     posts: PostsSelect<false> | PostsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     photos: PhotosSelect<false> | PhotosSelect<true>;
+    videos: VideosSelect<false> | VideosSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     galleries: GalleriesSelect<false> | GalleriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
@@ -216,6 +218,8 @@ export interface Page {
     | ScrollBannerBlock
     | ScrollGalleryBlock
     | PhotographerProfileBlock
+    | FilmReelBlock
+    | PracticeBlock
   )[];
   meta?: {
     title?: string | null;
@@ -724,27 +728,6 @@ export interface PhotographerProfileBlock {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Specialities shown as a list of tags.
-   */
-  skills?:
-    | {
-        label: string;
-        id?: string | null;
-      }[]
-    | null;
-  contact?: {
-    email?: string | null;
-    phone?: string | null;
-    location?: string | null;
-  };
-  socials?:
-    | {
-        platform: 'instagram' | 'behance' | 'x' | 'linkedin' | 'vimeo' | 'website' | 'other';
-        url: string;
-        id?: string | null;
-      }[]
-    | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'photographerProfile';
@@ -1135,6 +1118,113 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FilmReelBlock".
+ */
+export interface FilmReelBlock {
+  eyebrow?: string | null;
+  /**
+   * A short statement about the work shown in the reel.
+   */
+  heading: string;
+  /**
+   * One short paragraph shown next to the film strip.
+   */
+  description?: string | null;
+  /**
+   * Short clips threaded through the film strip. Upload a clip to the Videos library and pick it, or paste a direct MP4 URL.
+   */
+  videos?:
+    | {
+        /**
+         * Pick a clip from the Videos library. Takes precedence over the external URL below.
+         */
+        media?: (number | null) | Video;
+        /**
+         * External MP4 URL, used when no video is selected above (e.g. https://assets.mixkit.co/videos/5218/5218-720.mp4).
+         */
+        url?: string | null;
+        /**
+         * Short caption printed on the frame, e.g. "The first look".
+         */
+        label?: string | null;
+        /**
+         * Small detail, e.g. "Sintra · 2024".
+         */
+        meta?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'filmReel';
+}
+/**
+ * Upload short video clips here. Page blocks pick from this library.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos".
+ */
+export interface Video {
+  id: number;
+  /**
+   * A short name for this clip, e.g. "The first look".
+   */
+  title?: string | null;
+  /**
+   * Optional description shown with the clip.
+   */
+  caption?: string | null;
+  /**
+   * When the clip was captured.
+   */
+  capturedAt?: string | null;
+  _key?: string | null;
+  prefix?: string | null;
+  _objectKey?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PracticeBlock".
+ */
+export interface PracticeBlock {
+  /**
+   * Specialities shown as a list of tags.
+   */
+  skills?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  contact?: {
+    email?: string | null;
+    phone?: string | null;
+    location?: string | null;
+  };
+  socials?:
+    | {
+        platform: 'instagram' | 'behance' | 'x' | 'linkedin' | 'vimeo' | 'website' | 'other';
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'practice';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1340,6 +1430,10 @@ export interface PayloadLockedDocument {
         value: number | Photo;
       } | null)
     | ({
+        relationTo: 'videos';
+        value: number | Video;
+      } | null)
+    | ({
         relationTo: 'categories';
         value: number | Category;
       } | null)
@@ -1452,6 +1546,8 @@ export interface PagesSelect<T extends boolean = true> {
         scrollBanner?: T | ScrollBannerBlockSelect<T>;
         scrollGallery?: T | ScrollGalleryBlockSelect<T>;
         photographerProfile?: T | PhotographerProfileBlockSelect<T>;
+        filmReel?: T | FilmReelBlockSelect<T>;
+        practice?: T | PracticeBlockSelect<T>;
       };
   meta?:
     | T
@@ -1619,6 +1715,34 @@ export interface PhotographerProfileBlockSelect<T extends boolean = true> {
             };
         id?: T;
       };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FilmReelBlock_select".
+ */
+export interface FilmReelBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  description?: T;
+  videos?:
+    | T
+    | {
+        media?: T;
+        url?: T;
+        label?: T;
+        meta?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PracticeBlock_select".
+ */
+export interface PracticeBlockSelect<T extends boolean = true> {
   skills?:
     | T
     | {
@@ -1898,6 +2022,29 @@ export interface PhotosSelect<T extends boolean = true> {
               filename?: T;
             };
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos_select".
+ */
+export interface VideosSelect<T extends boolean = true> {
+  title?: T;
+  caption?: T;
+  capturedAt?: T;
+  _key?: T;
+  prefix?: T;
+  _objectKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

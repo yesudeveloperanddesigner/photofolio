@@ -35,8 +35,9 @@ export const plugins: Plugin[] = [
       // UploadThing CDN instead of proxying every request through Payload.
       media: { disablePayloadAccessControl: true },
       photos: { disablePayloadAccessControl: true },
+      videos: { disablePayloadAccessControl: true },
     },
-    // Upload directly from the browser so large images bypass Vercel's
+    // Upload directly from the browser so large files bypass Vercel's
     // serverless request body limit. Requires UPLOADTHING_TOKEN.
     clientUploads: true,
     options: {

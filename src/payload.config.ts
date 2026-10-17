@@ -11,6 +11,7 @@ import { Pages } from './collections/Pages'
 import { Photos } from './collections/Photos'
 import { Posts } from './collections/Posts'
 import { Users } from './collections/Users'
+import { Videos } from './collections/Videos'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { Settings } from './Settings/config'
@@ -68,7 +69,7 @@ export default buildConfig({
     // Disable dev auto-push so migrations stay the single source of truth.
     push: false,
   }),
-  collections: [Pages, Posts, Media, Photos, Categories, Galleries, Users],
+  collections: [Pages, Posts, Media, Photos, Videos, Categories, Galleries, Users],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer, Settings],
   plugins,

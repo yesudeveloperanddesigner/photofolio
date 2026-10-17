@@ -108,6 +108,48 @@ export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
           },
         },
       ],
+    },
+    {
+      blockType: 'filmReel',
+      eyebrow: 'On commission',
+      heading: 'Weddings, birthdays, and everything in between.',
+      description:
+        'Commissioned films for weddings, birthdays and gatherings — small documentaries of the day, edited to keep the feeling of the room. Thread the reel to see the work.',
+      videos: [
+        {
+          url: 'https://assets.mixkit.co/videos/5218/5218-720.mp4',
+          label: 'The newlyweds',
+          meta: 'Sintra · 2024',
+        },
+        {
+          url: 'https://assets.mixkit.co/videos/5224/5224-720.mp4',
+          label: 'The bouquet walk',
+          meta: 'Cascais · 2024',
+        },
+        {
+          url: 'https://assets.mixkit.co/videos/5112/5112-720.mp4',
+          label: 'Make a wish',
+          meta: 'Alfama · 2023',
+        },
+        {
+          url: 'https://assets.mixkit.co/videos/4694/4694-720.mp4',
+          label: 'The birthday table',
+          meta: 'Príncipe Real · 2023',
+        },
+        {
+          url: 'https://assets.mixkit.co/videos/51541/51541-720.mp4',
+          label: 'A toast to the room',
+          meta: 'Lisbon · 2022',
+        },
+        {
+          url: 'https://assets.mixkit.co/videos/4606/4606-720.mp4',
+          label: 'Dance floor light',
+          meta: 'Porto · 2022',
+        },
+      ],
+    },
+    {
+      blockType: 'practice',
       skills: [
         { label: 'Documentary' },
         { label: 'Portraiture' },

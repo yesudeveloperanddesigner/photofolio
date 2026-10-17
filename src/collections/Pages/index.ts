@@ -5,9 +5,11 @@ import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { Archive } from '../../blocks/ArchiveBlock/config'
 import { CallToAction } from '../../blocks/CallToAction/config'
 import { Content } from '../../blocks/Content/config'
+import { FilmReel } from '../../blocks/FilmReel/config'
 import { FormBlock } from '../../blocks/Form/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
 import { PhotographerProfile } from '../../blocks/PhotographerProfile/config'
+import { Practice } from '../../blocks/Practice/config'
 import { ScrollBanner } from '../../blocks/ScrollBanner/config'
 import { ScrollGallery } from '../../blocks/ScrollGallery/config'
 import { hero } from '@/heros/config'
@@ -84,6 +86,8 @@ export const Pages: CollectionConfig<'pages'> = {
                 ScrollBanner,
                 ScrollGallery,
                 PhotographerProfile,
+                FilmReel,
+                Practice,
               ],
               required: true,
               admin: {
