@@ -5,7 +5,7 @@ import type { Page } from '@/payload-types'
 import { ArchiveBlock } from '@/blocks/ArchiveBlock/Component'
 import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { ContentBlock } from '@/blocks/Content/Component'
-import { FilmReelBlock } from '@/blocks/FilmReel/Component'
+import { FilmReel } from '@/blocks/FilmReel/Server'
 import { FormBlock } from '@/blocks/Form/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
 import { PhotographerProfileBlock } from '@/blocks/PhotographerProfile/Component'
@@ -17,7 +17,7 @@ const blockComponents = {
   archive: ArchiveBlock,
   content: ContentBlock,
   cta: CallToActionBlock,
-  filmReel: FilmReelBlock,
+  filmReel: FilmReel,
   formBlock: FormBlock,
   mediaBlock: MediaBlock,
   photographerProfile: PhotographerProfileBlock,

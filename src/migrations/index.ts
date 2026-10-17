@@ -6,6 +6,7 @@ import * as migration_20261015_235856_add_uploadthing_storage from './20261015_2
 import * as migration_20261017_131759_add_film_reel_block from './20261017_131759_add_film_reel_block';
 import * as migration_20261017_132632_add_videos_collection from './20261017_132632_add_videos_collection';
 import * as migration_20261017_135833_add_practice_block from './20261017_135833_add_practice_block';
+import * as migration_20261017_231157_add_film_reel_source from './20261017_231157_add_film_reel_source';
 
 export const migrations = [
   {
@@ -46,6 +47,11 @@ export const migrations = [
   {
     up: migration_20261017_135833_add_practice_block.up,
     down: migration_20261017_135833_add_practice_block.down,
-    name: '20261017_135833_add_practice_block'
+    name: '20261017_135833_add_practice_block',
+  },
+  {
+    up: migration_20261017_231157_add_film_reel_source.up,
+    down: migration_20261017_231157_add_film_reel_source.down,
+    name: '20261017_231157_add_film_reel_source'
   },
 ];

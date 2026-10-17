@@ -1131,6 +1131,10 @@ export interface FilmReelBlock {
    */
   description?: string | null;
   /**
+   * Use all videos from the Videos collection, or hand-pick specific clips.
+   */
+  source?: ('library' | 'manual') | null;
+  /**
    * Short clips threaded through the film strip. Upload a clip to the Videos library and pick it, or paste a direct MP4 URL.
    */
   videos?:
@@ -1726,6 +1730,7 @@ export interface FilmReelBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   description?: T;
+  source?: T;
   videos?:
     | T
     | {
