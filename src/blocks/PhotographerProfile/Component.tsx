@@ -59,6 +59,10 @@ export const PhotographerProfileBlock: React.FC<Props> = ({
       mm.add('(prefers-reduced-motion: reduce)', () => {
         gsap.set(gsap.utils.toArray('[data-caret]', section), { autoAlpha: 0 })
         gsap.set('[data-masonry]', { clearProps: 'all' })
+        gsap.utils.toArray<HTMLElement>('[data-about-text]', section).forEach((el) => {
+          const parent = el.parentElement
+          if (parent) gsap.set(parent, { clearProps: 'min-height' })
+        })
       })
 
       const build = (pinned: boolean) => {
@@ -85,6 +89,22 @@ export const PhotographerProfileBlock: React.FC<Props> = ({
           if (parent) gsap.set(parent, { minHeight: parent.offsetHeight })
           gsap.set(el, { text: '' })
         })
+        // Ensure text remains visible
+        gsap.set('[data-about-text]', { opacity: 1, visibility: 'visible' })
+
+        // On mobile, avoid clearing text (prevents disappearing)
+        if (!pinned) {
+          gsap.set(gsap.utils.toArray('[data-caret]', section), { autoAlpha: 0 })
+          gsap.set('[data-about-text]', { text: '' })
+          if (eyebrow) gsap.set(eyebrow, { text: copy.eyebrow })
+          if (headingEl) gsap.set(headingEl, { text: copy.heading })
+          if (bioEl) gsap.set(bioEl, { text: copy.bio })
+          gsap.utils.toArray<HTMLElement>('[data-about-text]', section).forEach((el) => {
+            const parent = el.parentElement
+            if (parent) gsap.set(parent, { clearProps: 'min-height' })
+          })
+          return
+        }
 
         gsap.set(gsap.utils.toArray('[data-caret]', section), { autoAlpha: 0 })
 
@@ -149,6 +169,11 @@ export const PhotographerProfileBlock: React.FC<Props> = ({
         type(eyebrow, carets.eyebrow, copy.eyebrow, 0.45, 0.3)
         type(headingEl, carets.heading, copy.heading, 0.85, 1.05)
         type(bioEl, carets.bio, copy.bio, 1.95, 1.8)
+        // Restore text visibility after timeline completes (safety)
+        tl.set('[data-about-text]', { opacity: 1, text: '' })
+        tl.set(eyebrow, { text: copy.eyebrow })
+        tl.set(headingEl, { text: copy.heading })
+        tl.set(bioEl, { text: copy.bio })
       }
 
       // Desktop pins the grid while the sequence plays; smaller screens scrub it
@@ -192,7 +217,7 @@ export const PhotographerProfileBlock: React.FC<Props> = ({
             </h2>
 
             {bio && (
-              <div className="max-w-[56ch] text-base leading-relaxed text-muted-foreground md:text-lg order-last lg:order-none">
+              <div className="max-w-[56ch] text-base leading-relaxed text-muted-foreground md:text-lg order-1 lg:order-none">
                 <span data-about-text="bio">{bio}</span>
                 <span
                   aria-hidden
@@ -204,7 +229,7 @@ export const PhotographerProfileBlock: React.FC<Props> = ({
           </div>
 
           {cluster.length > 0 && (
-            <div className="lg:col-span-6 xl:col-span-7" data-masonry-cluster>
+            <div className="lg:col-span-6 xl:col-span-7 order-2 lg:order-none" data-masonry-cluster>
               <div className="columns-2 gap-2 sm:columns-3 sm:gap-3 lg:gap-2 xl:gap-3">
                 {cluster.map((item, index) => (
                   <figure
