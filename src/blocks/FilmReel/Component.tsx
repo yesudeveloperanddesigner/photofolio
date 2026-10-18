@@ -165,7 +165,7 @@ export const FilmReelBlock: React.FC<Props> = ({
               onRefresh: syncActive,
               onUpdate: syncActive,
               pin: pinned ? grid : false,
-              scrub: true,
+              scrub: pinned ? true : 1.5,
               start: pinned ? 'center center' : 'top 80%',
               trigger: filmWindow,
             },

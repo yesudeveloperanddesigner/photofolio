@@ -104,17 +104,17 @@ export const PhotographerProfileBlock: React.FC<Props> = ({
 
         const tl = gsap.timeline({
           defaults: { ease: 'none' },
-          scrollTrigger: {
-            anticipatePin: 1,
-            end: pinned ? '+=' + Math.round(window.innerHeight * 1.6) : 'bottom 65%',
-            invalidateOnRefresh: true,
-            pin: pinned ? grid : false,
-            scrub: true,
-            // Pin once the grid reaches the middle of the viewport so the copy
-            // and images stay vertically centred while the sequence plays.
-            start: pinned ? 'center center' : 'top 78%',
-            trigger: grid,
-          },
+            scrollTrigger: {
+              anticipatePin: 1,
+              end: pinned ? '+=' + Math.round(window.innerHeight * 1.6) : 'bottom 70%',
+              invalidateOnRefresh: true,
+              pin: pinned ? grid : false,
+              scrub: pinned ? true : 1.2,
+              // Pin once the grid reaches the middle of the viewport so the copy
+              // and images stay vertically centred while the sequence plays.
+              start: pinned ? 'center center' : 'top 82%',
+              trigger: grid,
+            },
         })
 
         // Images fly from the mess into their slots on the right.
@@ -190,14 +190,14 @@ export const PhotographerProfileBlock: React.FC<Props> = ({
             </h2>
 
             {bio && (
-              <p className="max-w-[56ch] text-base leading-relaxed text-muted-foreground md:text-lg">
+              <div className="max-w-[56ch] text-base leading-relaxed text-muted-foreground md:text-lg">
                 <span data-about-text="bio">{bio}</span>
                 <span
                   aria-hidden
                   className="ml-[0.1em] inline-block h-[0.9em] w-[2px] translate-y-[0.08em] bg-current align-baseline invisible"
                   data-caret="bio"
                 />
-              </p>
+              </div>
             )}
           </div>
 
