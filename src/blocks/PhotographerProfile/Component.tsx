@@ -106,13 +106,13 @@ export const PhotographerProfileBlock: React.FC<Props> = ({
           defaults: { ease: 'none' },
             scrollTrigger: {
               anticipatePin: 1,
-              end: pinned ? '+=' + Math.round(window.innerHeight * 1.6) : 'bottom 70%',
+              end: pinned ? '+=' + Math.round(window.innerHeight * 1.6) : 'bottom 75%',
               invalidateOnRefresh: true,
               pin: pinned ? grid : false,
-              scrub: pinned ? true : 1.2,
+              scrub: pinned ? true : 3,
               // Pin once the grid reaches the middle of the viewport so the copy
               // and images stay vertically centred while the sequence plays.
-              start: pinned ? 'center center' : 'top 82%',
+              start: pinned ? 'center center' : 'top 85%',
               trigger: grid,
             },
         })
@@ -148,13 +148,15 @@ export const PhotographerProfileBlock: React.FC<Props> = ({
 
         type(eyebrow, carets.eyebrow, copy.eyebrow, 0.45, 0.3)
         type(headingEl, carets.heading, copy.heading, 0.85, 1.05)
-        type(bioEl, carets.bio, copy.bio, 1.95, 1.5)
+        type(bioEl, carets.bio, copy.bio, 1.95, 1.8)
       }
 
       // Desktop pins the grid while the sequence plays; smaller screens scrub it
       // as the section passes through the viewport (no pinning to clip the stack).
       mm.add('(prefers-reduced-motion: no-preference) and (min-width: 1024px)', () => build(true))
       mm.add('(prefers-reduced-motion: no-preference) and (max-width: 1023px)', () => build(false))
+      // Also ensure smoother mobile experience
+      mm.add('(prefers-reduced-motion: no-preference) and (max-width: 767px)', () => build(false))
 
       return () => mm.revert()
     },
@@ -190,7 +192,7 @@ export const PhotographerProfileBlock: React.FC<Props> = ({
             </h2>
 
             {bio && (
-              <div className="max-w-[56ch] text-base leading-relaxed text-muted-foreground md:text-lg">
+              <div className="max-w-[56ch] text-base leading-relaxed text-muted-foreground md:text-lg order-last lg:order-none">
                 <span data-about-text="bio">{bio}</span>
                 <span
                   aria-hidden

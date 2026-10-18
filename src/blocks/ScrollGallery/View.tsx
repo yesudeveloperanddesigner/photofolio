@@ -129,16 +129,16 @@ export const ScrollGalleryView: React.FC<Props> = ({ className, eyebrow, heading
               end: () => '+=' + getMetrics().travel,
               invalidateOnRefresh: true,
               pin,
-              scrub: true,
+                  scrub: 2,
               // Pin once the gallery reaches the middle of the viewport so it
               // stays vertically centred while the section is pinned, instead of
               // parking against the top of the tall pinned scroll region.
               start: 'center center',
               trigger: pin,
               snap: {
-                delay: 0.05,
-                duration: { max: 0.4, min: 0.15 },
-                ease: 'power2.inOut',
+                delay: 0.08,
+                duration: { max: 0.5, min: 0.25 },
+                ease: 'power2.out',
                 snapTo: (value: number) => {
                   const points = getSnapPoints()
                   return points.reduce(
@@ -168,7 +168,7 @@ export const ScrollGalleryView: React.FC<Props> = ({ className, eyebrow, heading
                 scrollTrigger: {
                   containerAnimation: scrollTween,
                   end: 'right left',
-                  scrub: true,
+              scrub: 3,
                   start: 'left right',
                   trigger: item,
                 },
