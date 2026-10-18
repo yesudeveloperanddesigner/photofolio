@@ -9,16 +9,7 @@ const validateVideoSource: Validate = (value, { siblingData }) => {
     : 'Provide a video from the library or an external MP4 URL.'
 }
 
-const validateManualClips: Validate = (_value, { siblingData }) => {
-  const sibling = siblingData as { source?: string; videos?: unknown[] } | undefined
-  if (sibling?.source === 'manual') {
-    const videos = sibling?.videos
-    if (!videos || !Array.isArray(videos) || videos.length === 0) {
-      return 'Add at least one clip when using hand-picked clips.'
-    }
-  }
-  return true
-}
+
 
 export const FilmReel: Block = {
   slug: 'filmReel',
@@ -49,32 +40,12 @@ export const FilmReel: Block = {
       },
     },
     {
-      name: 'source',
-      type: 'select',
-      defaultValue: 'library',
-      options: [
-        {
-          label: 'All videos from the library',
-          value: 'library',
-        },
-        {
-          label: 'Hand-picked clips',
-          value: 'manual',
-        },
-      ],
-      admin: {
-        description:
-          'Use all videos from the Videos collection, or hand-pick specific clips.',
-      },
-    },
-    {
       name: 'videos',
       type: 'array',
       admin: {
         description:
           'Short clips threaded through the film strip. Upload a clip to the Videos library and pick it, or paste a direct MP4 URL.',
         initCollapsed: true,
-        condition: (_, sibling) => sibling?.source === 'manual',
       },
       fields: [
         {
@@ -115,7 +86,6 @@ export const FilmReel: Block = {
         plural: 'Clips',
       },
       minRows: 1,
-      validate: validateManualClips,
     },
   ],
 }
